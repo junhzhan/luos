@@ -104,5 +104,7 @@ print:
 jmp_to_setup:
     db "jump to setup...", 10, 13, 0
 
+eee:
+    dw 0xffff
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
