@@ -16,12 +16,12 @@ void test(int count, ...) {
 }
 void kernel_main(int x, short y) {
     console_init();
-    char* s = "ziya";
-    printk("name: %s\n", s);
-    printk("name: %s\n", s);
+    printk("console initialized\n");
     gdt_init();
-
-    BOCHS_DEBUG_MAGIC
+    printk("gdt initialized\n");
+    idt_init();
+    printk("idt initialized\n");
+    __asm__("sti;");
     test(3, 40, 20, 10);
     while (true);
 

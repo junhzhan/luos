@@ -19,7 +19,6 @@ void gdt_init() {
     printk("init gdt...\n");
     __asm__("sgdt gdt_ptr;");
     memcpy(gdt, (void*)gdt_ptr.base, gdt_ptr.limit);
-    printk("gdt value is %x", gdt);
     gdt_ptr.base = (int)gdt;
     gdt_ptr.limit = sizeof(gdt) - 1;
     __asm__("lgdt gdt_ptr;");
