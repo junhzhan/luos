@@ -22,7 +22,6 @@ _start:
 
 
 read_hd:
-    xchg bx, bx
     mov dx, 0x1f2
     mov al, bl;bl=2
     out dx, al
