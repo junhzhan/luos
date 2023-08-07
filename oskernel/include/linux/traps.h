@@ -10,4 +10,6 @@
 void gdt_init();
 void idt_init();
 
+void send_eoi(int idt_index);
+
 #endif //ZIYA_OSKERNEL_RESEARCH_TRAPS_H

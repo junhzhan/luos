@@ -13,12 +13,16 @@ interrupt_gate_t interrupt_table[INTERRUPT_TABLE_SIZE] = {0};
 char idt_ptr[6] = {0};
 
 extern void interrupt_handler();
+extern void keymap_handler_entry();
 
 void idt_init() {
     for (int i = 0; i < INTERRUPT_TABLE_SIZE; ++i) {
         interrupt_gate_t* p = &interrupt_table[i];
 
         int handler = interrupt_handler;
+        if (i == 0x21) {
+            handler = keymap_handler_entry;
+        }
 
         p->offset0 = handler & 0xffff;
         p->offset1 = (handler >> 16) & 0xffff;
