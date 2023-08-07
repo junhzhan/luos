@@ -29,7 +29,7 @@ _start:
     out 0a1h, al
 
 .enable_intr:
-    mov al, 11111101b
+    mov al, 11111100b
     out 21h, al
 
     mov al, 11111111b

@@ -22,6 +22,7 @@ void kernel_main(int x, short y) {
     idt_init();
     printk("idt initialized\n");
     __asm__("sti;");
+
     test(3, 40, 20, 10);
     while (true);
 
