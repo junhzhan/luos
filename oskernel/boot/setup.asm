@@ -3,6 +3,13 @@
 
 [SECTION .data]
 KERNEL_ADDR equ 0x1200
+
+ARDS_TIMES_BUFFER equ 0x1100
+ARDS_BUFFER equ 0x1102
+ARDS_TIMES dw 0
+
+CHECK_BUFFER_OFFSET dw 0
+
 [SECTION .gdt]
 SEG_BASE equ 0
 SEG_LIMIT equ 0xfffff
@@ -53,6 +60,33 @@ setup_start:
     mov     si, prepare_enter_protected_mode_msg
     call    print
 
+memory_check:
+    xor ebx, ebx
+    mov di, ARDS_BUFFER
+.loop:
+    mov eax, 0xE820
+    mov ecx, 20
+    mov edx, 0x534D4150
+    int 0x15
+
+    jc memory_check_error
+
+    add di, cx
+
+    inc dword [ARDS_TIMES]
+
+    xchg bx, bx
+    cmp ebx, 0
+    jne .loop
+
+    mov ax, [ARDS_TIMES]
+    mov [ARDS_TIMES_BUFFER], ax
+
+    mov [CHECK_BUFFER_OFFSET], di
+
+.memory_check_success:
+    mov si, memory_check_success_msg
+    call print
 enter_protected_mode:
     ;关中断
     cli
@@ -71,6 +105,13 @@ enter_protected_mode:
     mov cr0, eax
 
     jmp CODE_SELECTOR:protected_mode
+
+memory_check_error:
+    mov si, memory_check_error_msg
+    call print
+
+    jmp $
+
 
 ; 如何调用
 ; mov     si, msg   ; 1 传入字符串
@@ -190,3 +231,8 @@ read_hd_data:
 
 prepare_enter_protected_mode_msg:
     db "Prepare to go into protected mode", 10, 13, 0
+memory_check_error_msg:
+    db "memory check fail...", 10, 13, 0
+
+memory_check_success_msg:
+    db "memory check success...", 10, 13, 0

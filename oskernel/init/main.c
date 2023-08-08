@@ -3,6 +3,7 @@
 #include "../include/linux/kernel.h"
 #include "../include/asm/system.h"
 #include "../include/linux/traps.h"
+#include "../include/linux/mm.h"
 
 void test(int count, ...) {
     uint* addr = &count + count;
@@ -21,6 +22,7 @@ void kernel_main(int x, short y) {
     printk("gdt initialized\n");
     idt_init();
     printk("idt initialized\n");
+    print_check_memory_info();
     __asm__("sti;");
 
     test(3, 40, 20, 10);
