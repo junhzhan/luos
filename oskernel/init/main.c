@@ -23,6 +23,20 @@ void kernel_main(int x, short y) {
     idt_init();
     printk("idt initialized\n");
     print_check_memory_info();
+    memory_init();
+    memory_map_init();
+
+    for (int i = 0;i < 0x2000;i++) {
+        void* p = get_free_page();
+        printk("%p\n", p);
+        if (p == NULL) {
+            break;
+        }
+    }
+    free_page((void*)0x104000);
+    free_page((void*)0x105000);
+    void* p = get_free_page();
+    printk("%p\n", p);
     __asm__("sti;");
 
     test(3, 40, 20, 10);
