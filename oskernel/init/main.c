@@ -24,6 +24,7 @@ void kernel_main(int x, short y) {
     gdt_init();
     printk("gdt initialized\n");
     idt_init();
+    __asm__("sti;");
     printk("idt initialized\n");
     print_check_memory_info();
     memory_init();
@@ -41,9 +42,7 @@ void kernel_main(int x, short y) {
     kfree_s(p, 1);
 
     kmalloc(100);
-    __asm__("sti;");
 
-    test(3, 40, 20, 10);
     while (true);
 
 }

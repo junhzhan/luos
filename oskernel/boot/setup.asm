@@ -98,7 +98,6 @@ enter_protected_mode:
     out 92h, al
 
     ;设置保护模式
-    xchg bx, bx
     mov eax, cr0
     or eax, 1
     mov cr0, eax
@@ -145,7 +144,6 @@ protected_mode:
    mov ecx, 3
    mov bl, 60
    call read_hd
-   xchg bx, bx
    jmp CODE_SELECTOR:KERNEL_ADDR
 
 read_hd:
