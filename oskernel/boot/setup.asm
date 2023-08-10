@@ -75,7 +75,6 @@ memory_check:
 
     inc dword [ARDS_TIMES]
 
-    xchg bx, bx
     cmp ebx, 0
     jne .loop
 

@@ -15,6 +15,9 @@ void test(int count, ...) {
     printk("first_param is %x\n", first_param);
     printk("%d, %d, %d", *addr, *(addr - 1), *(addr - 2));
 }
+void high_addr_func() {
+    while(true);
+}
 void kernel_main(int x, short y) {
     console_init();
     printk("console initialized\n");
@@ -25,18 +28,19 @@ void kernel_main(int x, short y) {
     print_check_memory_info();
     memory_init();
     memory_map_init();
+//    virtual_memory_init();
 
-    for (int i = 0;i < 0x2000;i++) {
-        void* p = get_free_page();
-        printk("%p\n", p);
-        if (p == NULL) {
-            break;
-        }
-    }
-    free_page((void*)0x104000);
-    free_page((void*)0x105000);
-    void* p = get_free_page();
-    printk("%p\n", p);
+    //跳转到2G虚拟地址处执行内核代码
+//    __asm__("mov eax, %0;"
+//            "add eax, 0x80000000;"
+//            "jmp eax;"::"r"(high_addr_func));
+
+    void* p = kmalloc(1);
+    printk("0x%p\n", p);
+
+    kfree_s(p, 1);
+
+    kmalloc(100);
     __asm__("sti;");
 
     test(3, 40, 20, 10);

@@ -56,29 +56,11 @@ void memory_map_init() {
         return;
     }
     g_physics_memory_map.addr_base = VALID_MEMORY_FROM;
-    g_physics_memory_map.map = (uchar*)VALID_MEMORY_FROM;
+    g_physics_memory_map.map = (uchar*)0x10000;
 
     g_physics_memory_map.pages_total = g_physics_memory.pages_total;
 
     memset(g_physics_memory_map.map, 0, g_physics_memory_map.pages_total);
-    g_physics_memory_map.bitmap_item_used = g_physics_memory_map.pages_total / PAGE_SIZE;
-    if (g_physics_memory_map.pages_total % PAGE_SIZE != 0) {
-        printk("need another bitmap page\n");
-        g_physics_memory_map.bitmap_item_used += 1;
-    }
-    for (int i = 0; i < g_physics_memory_map.bitmap_item_used;i++) {
-        g_physics_memory_map.map[i] = 1;
-    }
-    printk("physics memory map position: 0x%X(%dM) - 0x%X(%dM)\n",
-           g_physics_memory_map.map,
-           ((int)g_physics_memory_map.map) / 1024 / 1024,
-           g_physics_memory_map.addr_base,
-           g_physics_memory_map.addr_base / 1024 / 1024);
-
-    printk("physical memory starts here: 0x%X(%dM), used: %d pages\n",
-           g_physics_memory_map.addr_base, g_physics_memory_map.addr_base / 1024 / 1024,
-           g_physics_memory_map.bitmap_item_used);
-
 }
 
 void* get_free_page() {

@@ -13,6 +13,18 @@ struct C {
     char c2;
     char c3;
 };
+struct point {
+    int x;
+    int y;
+};
+
+struct point make_point(int x, int y) {
+    struct point temp;
+    temp.x = x;
+    temp.y = y;
+    return temp;
+}
+
 int main() {
     int a = 1;
     char* p = &a;
@@ -21,6 +33,8 @@ int main() {
     unsigned int ebp_value;
     __asm__("mov %%ebp, %0":"=r"(ebp_value));
     printf("Value of EBP:%x\n", ebp_value);
+    struct point x = make_point(2, 3);
+
 //    for (int i = 0, len = 0x1000;i < len;i++) {
 //        unsigned short* current = (p + i);
 //        printf ("%x\n", current[0]);
