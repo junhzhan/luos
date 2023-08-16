@@ -4,6 +4,10 @@
 #include "../include/asm/system.h"
 #include "../include/linux/traps.h"
 #include "../include/linux/mm.h"
+#include "../include/linux/task.h"
+#include "../include/linux/sched.h"
+
+extern void clock_init();
 
 void test(int count, ...) {
     uint* addr = &count + count;
@@ -24,11 +28,15 @@ void kernel_main(int x, short y) {
     gdt_init();
     printk("gdt initialized\n");
     idt_init();
-    __asm__("sti;");
     printk("idt initialized\n");
     print_check_memory_info();
     memory_init();
     memory_map_init();
+
+    clock_init();
+
+    task_init();
+    __asm__("sti;");
 //    virtual_memory_init();
 
     //跳转到2G虚拟地址处执行内核代码
@@ -36,12 +44,12 @@ void kernel_main(int x, short y) {
 //            "add eax, 0x80000000;"
 //            "jmp eax;"::"r"(high_addr_func));
 
-    void* p = kmalloc(1);
-    printk("0x%p\n", p);
-
-    kfree_s(p, 1);
-
-    kmalloc(100);
+//    void* p = kmalloc(1);
+//    printk("0x%p\n", p);
+//
+//    kfree_s(p, 1);
+//
+//    kmalloc(100);
 
     while (true);
 
