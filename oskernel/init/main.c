@@ -4,6 +4,8 @@
 #include "../include/asm/system.h"
 #include "../include/linux/traps.h"
 #include "../include/linux/mm.h"
+#include "../include/linux/task.h"
+#include "../include/linux/sched.h"
 
 void test(int count, ...) {
     uint* addr = &count + count;
@@ -36,12 +38,10 @@ void kernel_main(int x, short y) {
 //            "add eax, 0x80000000;"
 //            "jmp eax;"::"r"(high_addr_func));
 
-    void* p = kmalloc(1);
-    printk("0x%p\n", p);
 
-    kfree_s(p, 1);
+    task_init();
 
-    kmalloc(100);
+    sched();
 
     while (true);
 
