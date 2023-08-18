@@ -16,6 +16,20 @@ task_t* current = NULL;
 
 task_t* find_ready_task() {
     task_t* next = NULL;
+    bool is_all_zero = true;
+    bool is_null = true;
+    for (int i = 1; i < NR_TASKS;i++) {
+        task_t* task = tasks[i];
+        if (task == NULL) continue;
+        is_null = false;
+        if (task->counter != 0) {
+            is_all_zero = false;
+            break;
+        }
+    }
+
+    //任务存在，但是时间片都是0
+    if (!is_null && is_all_zero) goto reset_task;
 
     for (int i = 1; i < NR_TASKS; ++i) {
         task_t* task = tasks[i];
@@ -27,23 +41,46 @@ task_t* find_ready_task() {
         }
 
         if (TASK_READY != task->state) continue;
+        if (next == NULL) {
+            next = task;
+        } else {
+            if (task->counter > next->counter) {
+                next = task;
+            }
 
-        next = task;
+        }
+    }
+    if (next == NULL) {
+        next = tasks[0];
     }
 
     return next;
+
+reset_task:
+    if (is_all_zero) {
+        for (int i = 1; i < NR_TASKS; ++i) {
+            task_t *tmp = tasks[i];
+
+            if (NULL == tmp) continue;
+
+            tmp->counter = tmp->priority;
+        }
+
+        // 重新设置counter后，再次查找可调度的任务
+        return find_ready_task();
+    }
+
 }
 
 void sched() {
-    task_t* next = find_ready_task();
+    if (NULL != current) {
+        if (TASK_SLEEPING != current->state) {
+            current->state = TASK_READY;
+        }
 
-    if (NULL == next) {
-        current = tasks[0];
-
-        switch_idle_task(tasks[0]);
-
-        return;
+        current = NULL;
     }
+    task_t* next = find_ready_task();
 
     next->state = TASK_RUNNING;
 
@@ -53,5 +90,12 @@ void sched() {
 }
 
 void do_timer() {
+    if (current == NULL) {
+        sched();
+    }
+    if (current != NULL && current->counter > 0) {
+        current->counter--;
+        return;
+    }
     sched();
 }
