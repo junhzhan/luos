@@ -7,6 +7,7 @@
 #include "../include/linux/task.h"
 #include "../include/linux/sched.h"
 
+extern void clock_init();
 void test(int count, ...) {
     uint* addr = &count + count;
     unsigned int ebp_value;
@@ -26,7 +27,7 @@ void kernel_main(int x, short y) {
     gdt_init();
     printk("gdt initialized\n");
     idt_init();
-    __asm__("sti;");
+    clock_init();
     printk("idt initialized\n");
     print_check_memory_info();
     memory_init();
@@ -40,8 +41,6 @@ void kernel_main(int x, short y) {
 
 
     task_init();
-
-    sched();
 
     while (true);
 

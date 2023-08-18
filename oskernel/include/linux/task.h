@@ -1,3 +1,6 @@
+//
+// Created by ziya on 22-7-6.
+//
 
 #ifndef ZIYA_OSKERNEL_RESEARCH_TASK_H
 #define ZIYA_OSKERNEL_RESEARCH_TASK_H
@@ -5,6 +8,7 @@
 #include "types.h"
 #include "mm.h"
 
+// 进程上限
 #define NR_TASKS 64
 
 typedef void* (*task_fun_t)(void*);
@@ -18,6 +22,7 @@ typedef enum task_state_t {
     TASK_WAITING,  // 等待
     TASK_DIED,     // 死亡
 } task_state_t;
+
 typedef struct tss_t {
     u32 backlink; // 前一个任务的链接，保存了前一个任状态段的段选择子
     u32 esp0;     // ring0 的栈顶地址
@@ -51,20 +56,20 @@ typedef struct tss_t {
 } __attribute__((packed)) tss_t;
 
 typedef struct task_t {
-    tss_t tss;
-    int pid;
-    int ppid;
-    char name[32];
-    task_state_t  state;
-    int exit_code;
-    int count;
-    int priority;
-    int scheduling_times;
-    int esp0;
-    int ebp0;
-    int esp3;
-    int ebp3;
-    int magic;
+    tss_t           tss;
+    int             pid;
+    int             ppid;
+    char            name[32];
+    task_state_t    state;
+    int             exit_code;
+    int             counter;
+    int             priority;
+    int             scheduling_times;       // 调度次数
+    int             esp0;                   // 刚开始创建的时候 活动的esp3保存在tss中
+    int             ebp0;
+    int             esp3;
+    int             ebp3;
+    int             magic;
 }task_t;
 
 typedef union task_union_t {
@@ -74,4 +79,22 @@ typedef union task_union_t {
 
 task_t* create_task(char* name, task_fun_t fun, int priority);
 void task_init();
-#endif
+
+// 参数位置不可变，head.asm中有调用
+void task_exit(int code, task_t* task);
+void current_task_exit(int code);
+
+void task_sleep(int ms);
+void task_wakeup();
+
+int inc_scheduling_times(task_t* task);
+
+pid_t get_task_pid(task_t* task);
+pid_t get_task_ppid(task_t* task);
+
+task_t* create_child(char* name, task_fun_t fun, int priority);
+
+int get_esp3(task_t* task);
+void set_esp3(task_t* task, int esp);
+
+#endif //ZIYA_OSKERNEL_RESEARCH_TASK_H
