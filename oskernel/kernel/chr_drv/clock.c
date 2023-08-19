@@ -5,6 +5,7 @@
 #include "../../include/linux/traps.h"
 #include "../../include/asm/io.h"
 #include "../../include/linux/sched.h"
+#include "../../include/linux/task.h"
 
 #define PIT_CHAN0_REG 0X40
 #define PIT_CHAN2_REG 0X42
@@ -28,5 +29,9 @@ void clock_init() {
 
 void clock_handler(int idt_index) {
     cpu_tickes++;
+    task_wakeup();
+    if (cpu_tickes == 4802) {
+        printk("reach 4802");
+    }
     do_timer();
 }

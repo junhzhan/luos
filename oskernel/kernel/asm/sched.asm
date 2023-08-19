@@ -8,32 +8,6 @@ extern get_task_ppid
 
 extern current
 
-; 切idle任务专用
-global switch_idle_task
-switch_idle_task:
-    ; 恢复上下文
-    mov eax, [current]
-
-    ; 恢复ebp0 esp0
-    mov esp, [eax + 4]
-    mov ebp, [eax + 15 * 4]
-
-    ; 恢复通用寄存器
-    mov ecx, [eax + 11 * 4]
-    mov edx, [eax + 12 * 4]
-    mov ebx, [eax + 13 * 4]
-    mov esi, [eax + 16 * 4]
-    mov edi, [eax + 17 * 4]
-
-    mov eax, [eax + 8 * 4]      ; eip
-
-    sti
-
-    jmp eax
-
-    ; 下面这两句正常情况执行不到,一种保险策略,以防万一
-    sti
-    hlt
 
 ; return address
 ; 参数
@@ -93,3 +67,35 @@ task_exit_handler:
     ; 下面这两句正常情况执行不到,一种保险策略
     sti
     hlt
+
+global sched_task
+sched_task:
+    push ecx
+    mov ecx, [current]
+    cmp ecx, 0
+    je .pop_ecx
+
+    mov [ecx + 10 * 4], eax
+    mov [ecx + 12 * 4], edx
+    mov [ecx + 13 * 4], ebx
+    mov [ecx + 15 * 4], ebp
+    mov [ecx + 16 * 4], esi
+    mov [ecx + 17 * 4], edi
+
+    mov eax, [esp + 4]          ; eip
+    mov [ecx + 8 * 4], eax      ; tss.eip
+
+    mov eax, esp
+    add eax, 8
+    mov [ecx + 4], eax          ; tss.esp0
+
+    mov eax, ecx
+    pop ecx
+    mov [eax + 11 * 4], ecx
+    jmp .return
+.pop_ecx:
+    pop ecx
+.return:
+    call sched
+    ret
+
