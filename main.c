@@ -12,7 +12,7 @@ struct C {
     int i1;
     char c2;
     char c3;
-};
+}__attribute__((packed));
 struct point {
     int x;
     int y;
@@ -31,8 +31,8 @@ int main() {
     unsigned int times = 0;
     printf("%d", sizeof(struct C));
     unsigned int ebp_value;
-    __asm__("mov %%ebp, %0":"=r"(ebp_value));
-    printf("Value of EBP:%x\n", ebp_value);
+    __asm__("mov %%ebp, %0"::"m"(*p));
+    printf("Value of EBP:%x\n", a);
     struct point x = make_point(2, 3);
 
 //    for (int i = 0, len = 0x1000;i < len;i++) {

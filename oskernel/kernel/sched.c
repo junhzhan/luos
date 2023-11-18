@@ -13,6 +13,7 @@ extern void switch_idle_task(task_t* task);
 extern task_t* tasks[NR_TASKS];
 
 task_t* current = NULL;
+extern tss_t tss;
 
 task_t* find_ready_task() {
     task_t* next = NULL;
@@ -85,6 +86,9 @@ void sched() {
     next->state = TASK_RUNNING;
 
     current = next;
+    tss.ss0 = current->tss.ss0;
+    tss.esp0 = current->tss.esp0;
+
 
     switch_task(next);
 }

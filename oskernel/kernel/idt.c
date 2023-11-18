@@ -50,5 +50,6 @@ void idt_init() {
     BOCHS_DEBUG_MAGIC
     BOCHS_DEBUG_MAGIC
 
-    asm volatile("lidt idt_ptr;");
+    asm volatile("lidt idt_ptr;");//gas编译器
+
 }

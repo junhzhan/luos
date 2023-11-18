@@ -21,6 +21,11 @@ void test(int count, ...) {
 void high_addr_func() {
     while(true);
 }
+
+void user_mode() {
+    int age = 10;
+    while (true);
+}
 void kernel_main(int x, short y) {
     console_init();
     printk("console initialized\n");
@@ -42,6 +47,7 @@ void kernel_main(int x, short y) {
 
     task_init();
 
+    BOCHS_DEBUG_MAGIC
     while (true);
 
 }

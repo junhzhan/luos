@@ -11,6 +11,8 @@ extern task_t* current;
 extern int jiffy;
 extern int cpu_tickes;
 extern void sched_task();
+extern void* move_to_user_mode(void*);
+extern int r0_data_selector;
 
 task_t* tasks[NR_TASKS] = {0};
 
@@ -53,7 +55,7 @@ task_t* create_task(char* name, task_fun_t fun, int priority) {
     // 加入tasks
     tasks[task->task.pid] = &(task->task);
 
-    task->task.tss.cr3 = (int)task + sizeof(task_t);
+    task->task.tss.cr3 = virtual_memory_init();
     task->task.tss.eip = fun;
 
     // r0 stack
@@ -61,6 +63,11 @@ task_t* create_task(char* name, task_fun_t fun, int priority) {
     task->task.ebp0 = task->task.esp0;
 
     task->task.tss.esp0 = task->task.esp0;
+    task->task.tss.ss0 = r0_data_selector;
+    task->task.esp3 = kmalloc(4096) + PAGE_SIZE;
+    task->task.ebp3 = task->task.esp3;
+    task->task.tss.esp = task->task.esp3;
+    task->task.tss.ebp = task->task.ebp3;
 
     task->task.state = TASK_READY;
 
@@ -93,9 +100,8 @@ void* t4_fun(void* arg) {
 }
 
 void* idle(void* arg) {
-    create_task("t1", t1_fun, 1);
-    create_task("t2", t2_fun, 2);
-    create_task("t3", t3_fun, 3);
+    BOCHS_DEBUG_MAGIC
+    create_task("init", move_to_user_mode, 1);
 
     while (true) {
 
@@ -188,4 +194,11 @@ void task_wakeup() {
             task->counter = task->priority;
         }
     }
+}
+int get_esp3(task_t* task) {
+    return task->esp3;
+}
+
+void set_esp3(task_t* task, int esp) {
+    task->tss.esp = esp;
 }

@@ -23,7 +23,6 @@ keymap_handler_entry:
 %macro INTERRUPT_HANDLER 1
 global interrupt_handler_%1
 interrupt_handler_%1:
-    xchg bx, bx
     pushad;往栈中压入所有寄存器
     push %1
     call exception_handler
